@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div>
+
+<div>
+
+
+    <button id="addButton">
+        Add New Product
+    </button>
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Delete</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody id="table">
+        </tbody>
+    </table>
+    
+</div>
+
+<script>
+    $(document).ready(() => {
+        loadProduct()
+    })
+
+    const loadProduct = () => {
+        $.ajax({
+            url : "/api/tblproducts",
+            type : "GET",
+            contentType : "application/json",
+            success: (data) => {
+                let rows = "";
+                $.each(data,(i,p)=>{
+                    rows += '<tr>' +
+                    '<td>' + p.name + '</td>' +
+                    '<td>' + p.price + '</td>' +
+                    '<td>' + '<button onclick="deleteProduct('+ p.id +')">Delete</button>' + '</td>' +
+                    '</tr>'
+                })
+
+                $('#table').html(rows)
+            }
+        })
+
+        $("#addButton").click(() => {
+            var item = {
+                id : 8888,
+                Name : 'test',
+                Price : 12
+            }
+
+            $.ajax({
+                url: "/api/tblproducts",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(item),
+                success: () => {
+                    loadProduct()
+                }
+            })
+        })
+    }
+
+    const deleteProduct = (id) =>{
+        $.ajax({
+                url: "/api/tblproducts/" + id,
+                type: "DELETE",
+                success: () => {
+                    loadProduct()
+                }
+        })
+    }
+
+        function updateProduct(id) {
+        
+            var updatedProduct = {
+                Id: id,
+                Name: row.find('.product-name').val(),
+                Price: parseFloat(row.find('.product-price').val()),
+                Quantity: parseInt(row.find('.product-quantity').val())
+            };
+
+            $.ajax({
+                url: '/api/ProductApi/' + id,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedProduct),
+                success: function () {
+                    loadProducts(); // Reload products to reflect changes
+                }
+            });
+        }
+</script>
+
+
